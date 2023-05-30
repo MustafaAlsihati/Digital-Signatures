@@ -34,7 +34,7 @@ const config = {
   oAuthBasePath: process.env.OAUTH_BASE_PATH as string,
   publicKeyPath: process.env.PUBLIC_KEY_PATH as string,
   privateKeyPath: process.env.PRIVATE_KEY_PATH as string,
-  redirectUri: process.env.REDIRECT_URI as string,
+  redirectUri: process.env.REDIRECT_URL as string,
   scopes: ['signature', 'impersonation'],
   expiresIn: 10 * 60,
 };

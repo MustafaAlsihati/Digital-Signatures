@@ -7,7 +7,7 @@ declare global {
       ACCOUNT_BASE_URI: string;
       OAUTH_BASE_PATH: string;
       CLIENT_SECRET: string;
-      REDIRECT_URI: string;
+      REDIRECT_URL: string;
       PUBLIC_KEY_PATH: string;
       PRIVATE_KEY_PATH: string;
     }
