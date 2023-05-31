@@ -1,28 +1,23 @@
 import * as DocuSign from 'docusign-esign';
 import * as fs from 'fs';
 import { getDocument } from './template';
-import { getUniqueUid } from './utils';
+import { getId } from './utils';
 import { Args, EnvelopeArgs } from './types';
 
 export default async function onSendDocuSignEmail() {
-  try {
-    // * Get Access Token and User Info:
-    const { access_token, require_signer_authentication, consent_url } =
-      await getAuthCode();
-    // * Return Consent URL only if User Token is not valid:
-    if (require_signer_authentication) {
-      return { consent_url };
-    }
-    // * Get User Info:
-    const userInfo = await getUserInfo(access_token);
-    // * Send Envelope:
-    const result = await sendEnvelope(userInfo, access_token);
-    // = Return Result:
-    return result;
-  } catch (error) {
-    console.error('[ERR @ sendDocuSignEmail]:', error.message);
-    throw new Error(error.message);
+  // * Get Access Token and User Info:
+  const { access_token, require_signer_authentication, consent_url } =
+    await getAuthCode();
+  // * Return Consent URL only if User Token is not valid:
+  if (require_signer_authentication) {
+    return { consent_url };
   }
+  // * Get User Info:
+  const userInfo = await getUserInfo(access_token);
+  // * Send Envelope:
+  const result = await sendEnvelope(userInfo, access_token);
+  // = Return Result:
+  return result;
 }
 
 const config = {
@@ -88,17 +83,23 @@ const sendEnvelope = async (
   accountInfo: DocuSign.UserInfo,
   accessToken: string,
 ) => {
+  const userInfo =
+    'accounts' in accountInfo
+      ? (accountInfo.accounts as any[]).find(
+          account => account.isDefault === 'true',
+        )
+      : undefined;
   const args: Args = {
     accessToken: accessToken,
-    basePath: config.accountBaseUri,
-    accountId: config.apiAccountId,
+    basePath: `${userInfo?.baseUri}/restapi`,
+    accountId: userInfo?.accountId,
     envelopeArgs: {
       status: 'sent',
-      signerEmail: accountInfo.email ?? '',
+      signerEmail: accountInfo.email ?? userInfo?.email ?? '',
       signerName:
         'name' in accountInfo
           ? (accountInfo.name as string)
-          : accountInfo.userName ?? '',
+          : accountInfo.userName ?? userInfo?.name ?? userInfo?.userName ?? '',
       emailSubject: 'Please Sign This Document', // todo: change this...
     },
   };
@@ -110,30 +111,28 @@ const sendEnvelope = async (
   const envelopesApi = new DocuSign.EnvelopesApi(dsApi);
   // * Create Envelope:
   const envelope = makeEnvelope(args.envelopeArgs);
-
   // todo: fix this...
   const results = await envelopesApi.createEnvelope(args.accountId, {
     envelopeDefinition: envelope,
   });
-  console.log('gg5');
   // = Result:
   return results;
 };
 
 const makeEnvelope = (envArgs: EnvelopeArgs) => {
-  // * Generate ID:
-  const id = getUniqueUid();
-  // * Add Document:
-  let document = new (DocuSign as any).Document();
-  document.documentBase64 = Buffer.from(getDocument(envArgs)).toString(
-    'base64',
-  );
-  document.name = 'Please Sign This Document';
-  document.fileExtension = 'html';
-  document.documentId = id;
   // * Envilope Definition:
   let env = new (DocuSign as any).EnvelopeDefinition();
-  env.emailSubject = 'Please sign this document set';
+  env.emailSubject = envArgs.emailSubject;
+  // * Generate ID:
+  const id = getId();
+  // * Add Document:
+  const base64Doc = Buffer.from(getDocument(envArgs)).toString('base64');
+  const document = new (DocuSign as any).Document.constructFromObject({
+    documentBase64: base64Doc,
+    name: envArgs.emailSubject,
+    fileExtension: 'html',
+    documentId: id,
+  });
   env.documents = [document];
   // * Add Signer:
   let signer = (DocuSign as any).Signer.constructFromObject({
