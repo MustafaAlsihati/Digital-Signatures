@@ -37,10 +37,10 @@ router.post('/docusign', async (req: IntegraterReq, res) => {
       return;
     }
     // = Send Result Back to Client:
-    res.send(result);
+    res.status(200).send(result);
   } catch (error) {
     console.error(error);
-    res.status(500).send({ message: error.message });
+    res.status(500).send({ code: 500, message: error.message });
   }
 });
 
