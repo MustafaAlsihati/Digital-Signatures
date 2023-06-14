@@ -15,13 +15,6 @@
         "operationId": "SendDocuSignEmail-v1",
         "parameters": [
           {
-            "name": "x-client-id",
-            "in": "header",
-            "description": "Client ID",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "x-user-id",
             "in": "header",
             "description": "User ID",
@@ -29,19 +22,19 @@
             "type": "string"
           },
           {
-            "name": "x-api-version",
-            "in": "header",
-            "description": "Api version (if not specified, the latest version will be used)",
-            "required": true,
-            "type": "string",
-            "example": "v1"
-          },
-          {
             "name": "x-api-key",
             "in": "header",
             "description": "Api Key",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "x-api-version",
+            "in": "header",
+            "description": "Api version (if not specified, the latest version will be used)",
+            "required": false,
+            "type": "string",
+            "example": "v1"
           },
           {
             "name": "htmls",

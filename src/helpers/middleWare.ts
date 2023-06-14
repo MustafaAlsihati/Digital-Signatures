@@ -22,9 +22,9 @@ export async function mustBeAuthorized(
   try {
     req.headers['x-api-version'] = req.headers['x-api-version'] ?? 'v1';
     // ? Check if client id is valid:
-    if (!req.headers['x-client-id']) {
-      throw new Error('Missing required header: x-client-id');
-    }
+    // if (!req.headers['x-client-id']) {
+    //   throw new Error('Missing required header: x-client-id');
+    // }
     // ? Check if user id is valid:
     const userAccessId = req.headers['x-user-id'];
     if (!userAccessId) {
@@ -65,6 +65,6 @@ export async function mustBeAuthorized(
     // = Continue to next middleware:
     next();
   } catch (error) {
-    res.status(401).send({ message: 'Invalid userId or apiKey' });
+    res.status(401).send({ message: error.message });
   }
 }
