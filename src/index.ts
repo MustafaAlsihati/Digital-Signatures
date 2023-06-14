@@ -23,6 +23,14 @@ app.use('/docs/v1', SwaggerUi.serve, v1Setup);
 // ? Redirect to latest version:
 app.use('/docs', (_, res) => res.redirect(`/docs/${latestVersion}`));
 
+// ! Invalid Routes:
+app.use('/', (_, res) => {
+  res.status(404).send({
+    code: 404,
+    message: 'Invalid Request',
+  });
+});
+
 // ? Listen on port 5000:
 app.listen(process.env.PORT ?? 5000, () => {
   process.env.NODE_ENV === 'dev' &&
