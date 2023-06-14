@@ -1,32 +1,16 @@
 import dotEnv from 'dotenv';
 dotEnv.config();
-import onSendDocuSignEmail from './docusign';
+import express from 'express';
+import routes from './routes';
+// import swaggerJsdoc from 'swagger-jsdoc';
+// import swaggerUi from 'swagger-ui-express';
 
-// # Run Server (Only in Development):
-if (process.env.NODE_ENV === 'dev') {
-  import('express').then(({ default: express }) => {
-    const app = express();
-    // ? Test Route to send email:
-    app.get('/send', async (_, res) => {
-      try {
-        const result = await onSendDocuSignEmail();
-        // * Redirect to Consent URL if User Token is not valid:
-        if ('consent_url' in result) {
-          res.redirect(result.consent_url);
-          return;
-        }
-        // = Send Result Back to Client:
-        res.send(result);
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: error.message });
-      }
-    });
-    // ? Listen on port 5000:
-    app.listen(5000, () => {
-      console.log(`Server is listening at: http://localhost:5000`);
-    });
-  });
-}
+// * Express App:
+const app = express();
+app.use('/api', routes);
 
-export default onSendDocuSignEmail;
+// ? Listen on port 5000:
+app.listen(process.env.PORT ?? 5000, () => {
+  process.env.NODE_ENV === 'dev' &&
+    console.log(`Server is listening at: http://localhost:5000`);
+});

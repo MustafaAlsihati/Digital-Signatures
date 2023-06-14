@@ -1,0 +1,42 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model services {
+  id           Int            @id @default(autoincrement())
+  name         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  integrations integrations[]
+}
+
+model users {
+  id           Int            @id @default(autoincrement())
+  name         String
+  email        String         @unique
+  password     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  integrations integrations[]
+}
+
+model integrations {
+  id             Int      @id @default(autoincrement())
+  user           users    @relation(fields: [userId], references: [id])
+  service        services @relation(fields: [serviceId], references: [id])
+  userId         Int
+  serviceId      Int
+  clientAccessId String?
+  userAccessId   String?
+  apiKey         String?
+  oAuthBasePath  String?
+  redirectUri    String?
+  privateKey     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
