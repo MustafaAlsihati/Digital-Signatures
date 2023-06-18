@@ -1,6 +1,6 @@
 import * as DocuSign from 'docusign-esign';
-import { DocuSignConfig } from '../../types';
-import { getId, toBuffer } from '../../helpers/utils';
+import { DocuSignConfig } from './types';
+import { getId } from './helpers/utils';
 
 export default async function onSendDocuSignEmail(config: DocuSignConfig) {
   // * Get Access Token and User Info:
@@ -31,7 +31,7 @@ const getAuthCode = async (config: DocuSignConfig) => {
       config.clientId,
       config.userId,
       [...SCOPES],
-      toBuffer(config.privateKey),
+      config.privateKey,
       EXPIRES_IN,
     );
     // = Result:

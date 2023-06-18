@@ -1,34 +1,42 @@
 import dotEnv from 'dotenv';
 dotEnv.config();
 import express from 'express';
-import SwaggerUi from 'swagger-ui-express';
-import routes from './routes';
+import * as fs from 'fs';
+// * Routes:
+import onSendDocuSignEmail from './docusign';
+import { DocuSignConfig, Signature, Signer } from './types';
 
-// # Package Json:
-const doc_v1_json = require('./docs/doc_v1.json');
-
-// * Express App:
 const app = express();
-app.use('/api', routes);
 
-// * Documentation:
-const latestVersion = '/v1';
-// ? Version 1:
-const options_v1 = {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Digital Signiture API v1',
-};
-const v1Setup = SwaggerUi.setup(doc_v1_json, options_v1);
-app.use('/docs/v1', SwaggerUi.serve, v1Setup);
-// ? Redirect to latest version:
-app.use('/docs', (_, res) => res.redirect(`/docs/${latestVersion}`));
+console.log('__dirname', __dirname);
 
-// ! Invalid Routes:
-app.use('/', (_, res) => {
-  res.status(404).send({
-    code: 404,
-    message: 'Invalid Request',
-  });
+app.get('/send', async (req, res) => {
+  try {
+    const privateKeyPath = process.env.PRIVATE_KEY_PATH!;
+    const privateKey = fs.readFileSync(`${__dirname}/${privateKeyPath}`);
+    let configs: DocuSignConfig = {
+      clientId: process.env.DOCUSIGN_CLIENT_ID!,
+      userId: process.env.DOCUSIGN_USER_ID!,
+      htmls: req.body.htmls as string[],
+      emailSubject: req.body.emailSubject as string,
+      oAuthBasePath: process.env.OAUTHBASEPATH!,
+      redirectUri: process.env.REDIRECT_URI!,
+      privateKey,
+      signers: req.body.signers as Signer[],
+      signatures: req.body.signatures as Signature[],
+    };
+    // * Send DocuSign Email:
+    const result = await onSendDocuSignEmail(configs);
+    // ? Redirect to Consent URL if User Token is not valid:
+    if ('consent_url' in result) {
+      res.redirect(result.consent_url);
+      return;
+    }
+    // = Send Result Back to Client:
+    res.send(result);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 // ? Listen on port 5000:

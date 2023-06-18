@@ -11,7 +11,7 @@ export interface DocuSignConfig {
   emailSubject: string;
   oAuthBasePath: string;
   redirectUri: string;
-  privateKey: string;
+  privateKey: Buffer;
   signers: Signer[];
   signatures: Signature[];
 }
