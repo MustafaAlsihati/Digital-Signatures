@@ -5,7 +5,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=dev nodemon ./src/index.ts"
+    "build": "tsc -p tsconfig.json",
+    "start": "node ./lib/index.js",
+    "dev": "cross-env NODE_ENV=dev nodemon ./src/index.ts",
+    "docker:build": "docker build . -t mustafaalsihati/digital-signature",
+    "docker:run": "docker run -p 5000:5000 mustafaalsihati/digital-signature"
   },
   "keywords": [],
   "license": "ISC",

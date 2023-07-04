@@ -1,6 +1,6 @@
-import dotEnv from 'dotenv';
+import * as dotEnv from 'dotenv';
 dotEnv.config();
-import express from 'express';
+import * as express from 'express';
 import * as fs from 'fs';
 // * Routes:
 import onSendDocuSignEmail from './docusign';
