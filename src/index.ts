@@ -8,20 +8,19 @@ import { DocuSignConfig, Signature, Signer } from './types';
 
 const app = express();
 
-console.log('__dirname', __dirname);
-
 app.get('/send', async (req, res) => {
   try {
-    const privateKeyPath = process.env.PRIVATE_KEY_PATH!;
-    const privateKey = fs.readFileSync(`${__dirname}/${privateKeyPath}`);
+    const privateKey = fs.readFileSync(`${__dirname}/keys/private.key`);
     let configs: DocuSignConfig = {
+      // * Environment Variables:
       clientId: process.env.DOCUSIGN_CLIENT_ID!,
       userId: process.env.DOCUSIGN_USER_ID!,
+      oAuthBasePath: process.env.OAUTHBASEPATH!,
+      privateKey,
+      // * Request Body:
+      redirectUri: req.body.redirectUri as string,
       htmls: req.body.htmls as string[],
       emailSubject: req.body.emailSubject as string,
-      oAuthBasePath: process.env.OAUTHBASEPATH!,
-      redirectUri: process.env.REDIRECT_URI!,
-      privateKey,
       signers: req.body.signers as Signer[],
       signatures: req.body.signatures as Signature[],
     };

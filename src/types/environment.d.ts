@@ -4,8 +4,7 @@ declare global {
       DOCUSIGN_CLIENT_ID: string;
       DOCUSIGN_USER_ID: string;
       OAUTHBASEPATH: string;
-      REDIRECT_URI: string;
-      PRIVATE_KEY_PATH: string;
+      CLIENT_SECRET: string;
       PORT?: string;
     }
   }
