@@ -8,7 +8,7 @@ import { DocuSignConfig, Signature, Signer } from './types';
 
 const app = express();
 
-app.get('/send', async (req, res) => {
+app.post('/send', async (req, res) => {
   try {
     const privateKey = fs.readFileSync(`${__dirname}/keys/private.key`);
     let configs: DocuSignConfig = {
