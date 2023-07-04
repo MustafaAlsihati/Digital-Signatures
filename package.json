@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "cp": "cpx \"./src/keys/*.*\" \"lib/keys\"",
+    "build": "tsc -p tsconfig.json && yarn cp",
     "start": "node ./lib/index.js",
     "dev": "cross-env NODE_ENV=dev nodemon ./src/index.ts",
     "docker:build": "docker build . -t mustafaalsihati/digital-signature",
@@ -14,6 +15,7 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "cpx": "^1.5.0",
     "docusign-esign": "^6.3.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
