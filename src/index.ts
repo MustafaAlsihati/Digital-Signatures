@@ -1,10 +1,11 @@
 import * as dotEnv from 'dotenv';
 dotEnv.config();
 import * as express from 'express';
-import * as fs from 'fs';
 // * Routes:
 import onSendDocuSignEmail from './docusign';
 import { DocuSignConfig, Signature, Signer } from './types';
+import { toBuffer } from './helpers/utils';
+import { getDocument } from './helpers/test_template';
 
 const app = express();
 app.use(express.json());
@@ -14,16 +15,17 @@ const router = express.Router();
 
 router.post('/send', async (req, res) => {
   try {
-    const privateKey = fs.readFileSync(`${__dirname}/keys/private.key`);
+    const privateKey = (process.env.PRIVATE_KEY ?? '').replace(/\\n/g, '\n');
     let configs: DocuSignConfig = {
       // * Environment Variables:
       clientId: process.env.DOCUSIGN_CLIENT_ID!,
       userId: process.env.DOCUSIGN_USER_ID!,
       oAuthBasePath: process.env.OAUTHBASEPATH!,
       redirectUri: process.env.REDIRECT_URI!,
-      privateKey,
+      privateKey: toBuffer(privateKey),
       // * Request Body:
-      htmls: req.body.htmls as string[],
+      // htmls: req.body.htmls as string[],
+      htmls: [getDocument()] as string[],
       emailSubject: req.body.emailSubject as string,
       signers: req.body.signers as Signer[],
       signatures: req.body.signatures as Signature[],
